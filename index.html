@@ -124,10 +124,10 @@ svg{display:block}
 .fld input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font:700 17px/1 var(--mono)}
 .fld:focus-within{border-color:#fff}
 .seg{display:inline-flex;border:1px solid var(--border-strong)}
-.seg button{height:42px;min-width:44px;padding:0 10px;font:600 12.5px/1 var(--mono);color:var(--text2)}
+.seg button{height:42px;min-width:40px;padding:0 8px;font:600 12.5px/1 var(--mono);color:var(--text2)}
 .seg button.on{background:#fff;color:#000}
 .row2{display:flex;gap:8px;align-items:center}
-.row2 .fld{flex:1}
+.row2 .fld{flex:1;min-width:0}
 .st{display:grid;grid-template-columns:22px 1fr auto auto;gap:9px;align-items:center;padding:9px 0 0;font-size:13px}
 .st .v{font:700 16px/1 var(--mono)}
 .st .r{font:600 12px/1 var(--mono);color:var(--text3);min-width:78px;text-align:right}
@@ -207,8 +207,8 @@ svg{display:block}
 .plan .pz small{display:block;font:600 11px/1.3 var(--body);color:var(--up)}
 .hint{color:var(--text3);font-size:12.5px;line-height:1.45;margin-top:10px}
 /* своя большая кнопка (вне Telegram) */
-.mb{position:absolute;left:12px;right:12px;bottom:calc(var(--tabh) + 10px);height:50px;background:#fff;color:#000;display:none;align-items:center;justify-content:center;gap:9px;font:800 15px/1 var(--body);border-radius:12px;z-index:30}
-.mb.on{display:flex}
+.mb{position:fixed;left:12px;right:12px;max-width:496px;margin:0 auto;bottom:calc(var(--tabh) + 10px);height:50px;background:#fff;color:#000;display:none;align-items:center;justify-content:center;gap:9px;font:800 15px/1 var(--body);border-radius:12px;z-index:30}
+.mb.on{display:flex}body.sht .mb{bottom:calc(var(--sbm) + 10px)}
 .mb svg{width:18px;height:18px}
 .toast{position:fixed;left:50%;bottom:calc(var(--tabh) + 70px);transform:translate(-50%,20px);background:#fff;color:#000;padding:10px 16px;border-radius:20px;font:700 13.5px/1.2 var(--body);opacity:0;transition:.2s;z-index:50;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0)}
@@ -222,8 +222,8 @@ svg{display:block}
   <section class="view" id="v-sig"></section>
   <section class="view" id="v-acc"></section>
   <nav class="tabs" id="tabs"></nav>
-  <button class="mb" id="mb"></button>
 </div>
+<button class="mb" id="mb"></button>
 <div class="dim" id="dim"></div>
 <div class="toast" id="toast"></div>
 <script>
@@ -426,7 +426,7 @@ function openSheet(id,title,html,onClose){
   document.body.appendChild(el); el.querySelector('.x').onclick=function(){hap();closeSheet()};
   stack.push({el:el,onClose:onClose});
   requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('on');$('#dim').classList.add('on')})});
-  if(inTG)tg.BackButton.show();
+  if(inTG)tg.BackButton.show();document.body.classList.add('sht');
   // свайп вниз по ручке
   var y0=null;el.querySelector('.grab').parentNode.addEventListener('touchstart',function(e){if(e.target.closest('.sb'))return;y0=e.touches[0].clientY},{passive:true});
   el.addEventListener('touchend',function(e){if(y0!=null&&e.changedTouches[0].clientY-y0>60)closeSheet();y0=null},{passive:true});
@@ -435,7 +435,7 @@ function openSheet(id,title,html,onClose){
 function closeSheet(){
   var s=stack.pop();if(!s)return;s.el.classList.remove('on');setTimeout(function(){s.el.remove()},300);
   s.onClose&&s.onClose();
-  if(!stack.length){$('#dim').classList.remove('on');if(inTG)tg.BackButton.hide();mainForTab()}
+  if(!stack.length){$('#dim').classList.remove('on');document.body.classList.remove('sht');if(inTG)tg.BackButton.hide();mainForTab()}
   else if(stack[stack.length-1].main)setMain.apply(null,stack[stack.length-1].main);
 }
 $('#dim').onclick=function(){closeSheet()};
@@ -474,8 +474,9 @@ function updArb(first){
   if(first||!focus){
   body.innerHTML='<div class="pp"><span class="plate num'+(gone?' gone':p1<0?' dn':'')+'">'+(gone?'вилка ушла · ':'')+'<s>'+f2(p0)+'%</s>→ '+f2(p1)+'%</span>'+sp(r.sp)+'<span class="bssc">'+sco(r.sc)+'</span></div>'+
    '<div class="bsev">'+esc(r.ev)+'</div><div class="bslg">'+esc(r.lg)+' · живёт '+age(now()-r.born)+'</div>'+
+   '<div style="margin:4px 0 4px">'+nm.map(function(n){return '<button class="pill" data-copy="'+esc(n)+'"><span>'+esc(n)+'</span>'+I.copy+'</button>'}).join('')+'</div>'+
    [0,1].map(function(i){return '<div class="bleg"><span class="no" style="background:var(--c'+(i+1)+')">'+(i+1)+'</span><div><div class="bk">'+esc(r.b[i])+(r.ini==i?'<i class="ini" style="background:var(--c'+(i+1)+')"></i>':'')+'</div>'+
-     '<button class="pill" data-copy="'+esc(nm[0])+'"><span>'+esc(nm[0])+'</span>'+I.copy+'</button><button class="pill" data-copy="'+esc(nm[1])+'"><span>'+esc(nm[1])+'</span>'+I.copy+'</button><span class="pill t">'+esc(r.t[i])+'</span></div>'+
+     '<span class="pill t">'+esc(r.t[i])+'</span></div>'+
      '<div class="kk"><b class="k'+(r.k[i]>r.k0[i]?' up':r.k[i]<r.k0[i]?' dn':'')+'">'+f2(r.k[i])+'</b><small>'+(r.k[i]!=r.k0[i]?'было '+f2(r.k0[i]):'&nbsp;')+'</small></div></div>'}).join('')+
    '<div class="oth'+(closedOpen?' cl':'')+'"><button class="hd" data-a="oth"><span>Кф на других букмекерах · демо</span>'+I.down+'</button><table><thead><tr><th>Букмекер</th><th>'+esc(r.t[0])+'</th><th>'+esc(r.t[1])+'</th></tr></thead><tbody>'+
    oth.map(function(o){return '<tr class="'+(o[3]?'l'+o[3]:'')+'"><td>'+esc(o[0])+'</td><td class="n'+(o[1]==bA?' best':'')+'">'+f2(o[1])+'</td><td class="n'+(o[2]==bB?' best':'')+'">'+f2(o[2])+'</td></tr>'}).join('')+
