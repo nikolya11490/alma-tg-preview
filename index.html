@@ -30,7 +30,7 @@ svg{display:block}
 .hdr .live{display:inline-flex;align-items:center;gap:7px;font:700 11px/1 var(--body);letter-spacing:.06em;color:var(--text2);padding:6px 9px;border:1px solid var(--border-strong);white-space:nowrap}
 .hdr .live:before{content:"";width:6px;height:6px;background:var(--up);border-radius:50%;animation:bl 1.6s infinite}
 @keyframes bl{50%{opacity:.25}}
-.view{position:absolute;left:0;right:0;top:calc(var(--st) + 46px);bottom:calc(var(--tabh) + var(--mbh));overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 12px 20px;display:none}
+.view{position:absolute;left:0;right:0;top:calc(var(--st) + 46px);bottom:calc(var(--tabh) + var(--mbh));overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:4px 12px 20px;display:none}
 .view.on{display:block}
 /* вкладки */
 .tabs{position:absolute;left:0;right:0;bottom:0;height:var(--tabh);padding:7px 6px var(--sbm);border-top:1px solid var(--border);background:#0a0a0a;display:grid;grid-template-columns:repeat(4,1fr);z-index:6}
@@ -135,7 +135,7 @@ svg{display:block}
 .tot b{color:var(--up);font:700 15px/1 var(--mono)}
 .tot b.dn{color:var(--down)}
 .lbl{font:700 11px/1 var(--body);letter-spacing:.08em;color:var(--text3);text-transform:uppercase;margin:16px 2px 8px}
-.kin{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kin{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}.kin .fld{min-width:0}.fld input{width:100%}
 .kin .fld span{width:22px;height:22px;display:grid;place-items:center;color:#000;font:800 12px/1 var(--body);margin-right:8px}
 .big{font:800 40px/1 var(--body);letter-spacing:-.03em}
 .calcres{margin-top:12px;background:var(--surface);border:1px solid var(--border);padding:14px 12px}
@@ -496,7 +496,7 @@ function arbClick(e){
   var a=e.target.closest('[data-a]');
   if(a&&a.dataset.a==='oth'){hap('sel');a.parentNode.classList.toggle('cl');return}
   if(a&&a.dataset.a==='cp'){var r=arbSnap;copy(stakeText(r.k,r.b),'Ставки скопированы');return}
-  if(a&&a.dataset.a==='tocalc'){var r2=arbSnap;CK={k:[f2(r2.k[0]),f2(r2.k[1])],b:r2.b.slice()};closeSheet();go('calc');renderCalc();return}
+  if(a&&a.dataset.a==='tocalc'){var r2=arbSnap;CK={k:[f2(r2.k[0]),f2(r2.k[1])],b:r2.b.slice()};save('ck',CK);var vc=$('#v-calc');vc.innerHTML='';closeSheet();go('calc');renderCalc();return}
   var s=e.target.closest('[data-seg] button');if(s){CALC.rnd=+s.dataset.v;save('calc',CALC);hap('sel');rerenderCalcs();return}
 }
 function calcInput(e){var t=e.target;if(t.dataset.in==='sum'){var v=parseFloat(t.value.replace(',','.'));if(v>0&&v<1e7){CALC.sum=v;save('calc',CALC);if(openId||arbSnap)updArb()}}}
@@ -509,7 +509,7 @@ function renderCalc(){
   var r=okk?roi(k):0;
   var head='<div class="lbl" style="margin-top:6px">Коэффициенты</div><div class="kin">'+[0,1].map(function(i){return '<label class="fld"><span style="background:var(--c'+(i+1)+')">'+(i+1)+'</span><input inputmode="decimal" data-k="'+i+'" value="'+esc(CK.k[i])+'"></label>'}).join('')+'</div>';
   var res='<div class="calcres" id="cres">'+resHtml(k,okk,r)+'</div>';
-  if(!v.querySelector('.kin')){v.innerHTML=head+'<div class="lbl">Сумма и округление</div><div id="cblk"></div>'+res+'<p class="hint">Нажмите «В калькулятор» в карточке вилки, чтобы перенести её сюда. Сумма и округление общие для всех вилок.</p>'}
+  if(!v.querySelector('.kin')){v.innerHTML=head+res+'<div class="lbl">Сумма и округление</div><div id="cblk"></div><p class="hint">Нажмите «В калькулятор» в карточке вилки, чтобы перенести её сюда. Сумма и округление общие для всех вилок.</p>'}
   else $('#cres').innerHTML=resHtml(k,okk,r);
   var blk=$('#cblk'),ae=document.activeElement,keep=ae&&ae.dataset&&ae.dataset.in==='sum'&&blk.contains(ae);
   var tmp=okk?calcBlock(k,CK.b,'calc'):'<div class="calc"><div class="row2"><label class="fld"><span>$</span><input inputmode="decimal" data-in="sum" value="'+CALC.sum+'"></label></div></div>';
